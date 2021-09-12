@@ -29,11 +29,11 @@ int Buffer::sink(const char *ins, long length) {
     const long s_length = length > 0 ? length : ins ? (long) strlen(ins) : 0;
     if (s_length <= 0) return 0;
     if (s_length > this->sizes()) {
-        LOGW("%s sink abort by sizes %ld < %ld.\n", this->name(), this->sizes(), s_length);
+        LOGW("%s sink abort because: sizes %ld < %ld.\n", this->name(), this->sizes(), s_length);
         return -2;
     }
     if (this->frees() < s_length) {
-        LOGD("%s sink flush by frees %ld < %ld.\n", this->name(), this->frees(), s_length);
+        LOGD("%s sink flush because: frees %ld < %ld.\n", this->name(), this->frees(), s_length);
         this->flush();
     }
     memcpy(this->value + this->seek + this->heads(), ins, s_length);

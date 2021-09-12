@@ -58,7 +58,7 @@ void Roselle::flush() {
         char chs[255];
         sprintf(chs, "%s.%s", this->path, buffer->name());
         const int sfd = open(chs, O_RDONLY, S_IRUSR | S_IWUSR);
-        LOGW("%s flush combine path=%s, fd=%d\n", this->name(), chs, sfd);
+        LOGW("%s flush buffer@%s fd=%d\n", this->name(), buffer->name(), sfd);
         if (sfd < 0) continue;
         lseek(sfd, 0, SEEK_SET);
         //read file length
@@ -80,7 +80,7 @@ void Roselle::flush() {
             break;
         }
         close(sfd);
-        LOGW("%s flush combine fd(%d) finish: limits=%ld, counts=%ld\n", this->name(), sfd, limits, counts);
+        LOGW("%s flush buffer@%s finish: limits=%ld, counts=%ld\n", this->name(), buffer->name(), limits, counts);
     }
     close(fd);
 }
