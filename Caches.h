@@ -13,7 +13,9 @@ private:
 public:
     Caches();
 
-    ~Caches();
+    ~Caches() override;
+
+    const char *name() override;
 
     long sizes() override;
 };

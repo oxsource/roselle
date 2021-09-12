@@ -6,11 +6,15 @@
 
 Buffer::Buffer() {
     this->value = nullptr;
-    this->next = nullptr;
     this->seek = 0;
+    this->backup = nullptr;
 }
 
 Buffer::~Buffer() = default;
+
+long Buffer::heads() {
+    return 0;
+}
 
 long Buffer::sizes() {
     return 0;
@@ -20,25 +24,30 @@ long Buffer::frees() {
     return this->sizes() - this->seek;
 }
 
-int Buffer::sink(const char *ins) {
+int Buffer::sink(const char *ins, long length) {
     if (!this->value) return -1;
-    const long length = (long) strlen(ins);
-    if (length <= 0) return 0;
-    if (this->frees() < length) return -1;
-    memcpy(this->value + this->seek, ins, length);
-    this->seek += length;
+    const long s_length = length > 0 ? length : ins ? (long) strlen(ins) : 0;
+    if (s_length <= 0) return 0;
+    if (s_length > this->sizes()) {
+        LOGW("%s sink abort by sizes %ld < %ld.\n", this->name(), this->sizes(), s_length);
+        return -2;
+    }
+    if (this->frees() < s_length) {
+        LOGD("%s sink flush by frees %ld < %ld.\n", this->name(), this->frees(), s_length);
+        this->flush();
+    }
+    memcpy(this->value + this->seek + this->heads(), ins, s_length);
+    this->seek += s_length;
     return 1;
 }
 
-int Buffer::flush(char *outs, long length) {
-    if (this->seek <= 0 || !this->value) return -1;
-    if (length < this->seek) return -2;
-    memcpy(outs, this->value, this->seek);
-    memset(this->value, '\0', this->sizes());
+void Buffer::flush() {
+    if (this->backup) {
+        this->backup->sink(this->value, this->seek);
+    }
     this->seek = 0;
-    return 1;
 }
 
-int Buffer::flush(Buffer *buf) {
-    return this->flush(buf->value, buf->seek);
+void Buffer::withBackup(Buffer *buffer) {
+    this->backup = buffer;
 }

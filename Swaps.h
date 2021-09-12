@@ -19,15 +19,17 @@ private:
 public:
     Swaps(const char *path, long size);
 
-    ~Swaps();
+    ~Swaps() override;
+
+    const char *name() override;
 
     long sizes() override;
 
     long frees() override;
 
-    int sink(const char *ins) override;
+    int sink(const char *ins, long length) override;
 
-    int flush(char *outs, long length) override;
+    void flush() override;
 };
 
 

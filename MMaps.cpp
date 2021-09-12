@@ -7,11 +7,11 @@
 MMaps::MMaps(const char *path, long size) : path(path), size(size) {
     LOGW("MMaps constructor path=%s, size=%ld.\n", path, size);
     //heads = max_length + \0 + \n, max support eight-digit number
-    this->heads = new MMapHeads("%08ld\n", 8 + 2);
+    this->head = new MMapHead("%08ld\n", 8 + 2);
+    this->fd = -1;
 }
 
 MMaps::~MMaps() {
-    LOGW("MMaps destructor called.\n");
     if (this->value) {
         long tSize = this->size > 0 ? this->size : 0;
         munmap(this->value, tSize);
@@ -29,15 +29,17 @@ void MMaps::prepare() {
     if (this->fd > 0) return;
     this->seek = -1;
     this->value = nullptr;
-    this->fd = open(this->path, O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
-    LOGW("MMaps setup fd=%d\n", this->fd);
+    char chs[255];
+    sprintf(chs, "%s.%s", this->path, this->name());
+    this->fd = open(chs, O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+    LOGW("MMaps setup path=%s, fd=%d\n", chs, this->fd);
     if (this->fd < 0) return;
     //reset file size
     ftruncate(this->fd, this->size);
     lseek(this->fd, 0, SEEK_SET);
     //read file length
-    char *seeks = (char *) malloc(this->heads->size);
-    read(this->fd, seeks, this->heads->size);
+    char *seeks = (char *) malloc(this->head->size);
+    read(this->fd, seeks, this->head->size);
     char *stops;
     this->seek = (long) ::strtol(seeks, &stops, 10);
     free(seeks);
@@ -49,24 +51,27 @@ void MMaps::prepare() {
     LOGW("MMaps setup: seek=%ld\n", this->seek);
 }
 
+const char *MMaps::name() {
+    return "MMaps";
+}
+
+long MMaps::heads() {
+    return this->head->size;
+}
+
 long MMaps::sizes() {
-    return this->fd < 0 || !this->value ? 0 : this->size - this->heads->size;
+    return this->fd < 0 || !this->value ? 0 : this->size - this->heads();
 }
 
 long MMaps::frees() {
     return this->fd < 0 || !this->value ? 0 : this->Buffer::frees();
 }
 
-int MMaps::sink(const char *ins) {
+int MMaps::sink(const char *ins, long length) {
     this->prepare();
     if (this->fd < 0 || !this->value) return -1;
-    const long length = (long) strlen(ins);
-    if (length <= 0) return 0;
-    if (this->frees() < length) return -1;
-    char *body = this->value + this->heads->size;
-    strcpy(body + this->seek, ins);
-    this->seek += length;
+    if (this->Buffer::sink(ins, length) <= 0) return -2;
     //update heads with format
-    sprintf(this->value, this->heads->fmt, this->seek);
+    sprintf(this->value, this->head->fmt, this->seek);
     return 1;
 }

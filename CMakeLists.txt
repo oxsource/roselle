@@ -3,4 +3,4 @@ project(lct)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(lct main.cpp Buffer.cpp Buffer.h Caches.cpp Caches.h MMapHeads.cpp MMapHeads.h MMaps.cpp MMaps.h Swaps.cpp Swaps.h)
+add_executable(lct main.cpp Buffer.cpp Buffer.h Caches.cpp Caches.h MMapHead.cpp MMapHead.h MMaps.cpp MMaps.h Swaps.cpp Swaps.h Roselle.cpp Roselle.h)

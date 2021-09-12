@@ -20,23 +20,26 @@ class Buffer {
 protected:
     char *value;
     long seek;
-public:
-    Buffer *next;
+    Buffer *backup;
 
+public:
     Buffer();
 
-    ~Buffer();
+    virtual ~Buffer() = 0;
+
+    virtual const char *name() = 0;
+
+    virtual long heads();
 
     virtual long sizes();
 
     virtual long frees();
 
-    virtual int sink(const char *ins);
+    virtual int sink(const char *ins, long length);
 
-    virtual int flush(char *outs, long length);
+    virtual void flush();
 
-    virtual int flush(Buffer *buf);
+    virtual void withBackup(Buffer *buffer);
 };
-
 
 #endif //LCT_BUFFER_H

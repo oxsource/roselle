@@ -11,27 +11,31 @@
 #include <fcntl.h>
 
 #include "Buffer.h"
-#include "MMapHeads.h"
+#include "MMapHead.h"
 
 class MMaps : public Buffer {
 private:
     const char *path;
     const long size;
     int fd;
-    MMapHeads *heads;
+    MMapHead *head;
 
     void prepare();
 
 public:
     MMaps(const char *path, long size);
 
-    ~MMaps();
+    ~MMaps() override;
+
+    const char *name() override;
+
+    long heads() override;
 
     long sizes() override;
 
     long frees() override;
 
-    int sink(const char *ins) override;
+    int sink(const char *ins, long length) override;
 };
 
 
