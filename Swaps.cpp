@@ -12,7 +12,7 @@ Swaps::Swaps(const char *path, long size) : path(path), size(size) {
 Swaps::~Swaps() = default;
 
 const char *Swaps::name() {
-    return "Swaps";
+    return "swaps";
 }
 
 long Swaps::sizes() {

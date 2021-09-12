@@ -26,7 +26,7 @@ Roselle::~Roselle() {
 }
 
 const char *Roselle::name() {
-    return "Roselle";
+    return "roselle";
 }
 
 long Roselle::sizes() {

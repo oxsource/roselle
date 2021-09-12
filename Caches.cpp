@@ -16,7 +16,7 @@ Caches::~Caches() {
 }
 
 const char *Caches::name() {
-    return "Caches";
+    return "caches";
 }
 
 long Caches::sizes() {

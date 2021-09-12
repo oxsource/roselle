@@ -52,7 +52,7 @@ void MMaps::prepare() {
 }
 
 const char *MMaps::name() {
-    return "MMaps";
+    return "mmaps";
 }
 
 long MMaps::heads() {
